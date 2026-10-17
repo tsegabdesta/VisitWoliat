@@ -746,7 +746,7 @@ jobs:
           import androidx.compose.runtime.setValue
 
           enum class AppLanguage(val code: String, val displayName: String, val nativeName: String) {
-              ENGLISH("en", "English", "English"),
+           ENGLISH("en", "English", "English"),
               AMHARIC("am", "Amharic", "አማርኛ"),
               WOLAITIGNA("wal", "Wolaitigna", "Wolayttattuwa")
           }
@@ -756,3 +756,4 @@ jobs:
                   AppLanguage.ENGLISH to mapOf(
                       "app_title" to "VISIT WOLIAT",
                       "slogan" to "
+          path: app/build/outputs...?)
