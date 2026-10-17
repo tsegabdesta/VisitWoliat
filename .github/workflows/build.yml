@@ -1,0 +1,979 @@
+name: Build Visit Woliat APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Scaffold Visit Woliat Project Files
+        run: |
+          mkdir -p app/src/main/res/values
+          mkdir -p app/src/main/java/com/visitwoliat/app/data
+          mkdir -p app/src/main/java/com/visitwoliat/app/localization
+          mkdir -p app/src/main/java/com/visitwoliat/app/navigation
+          mkdir -p app/src/main/java/com/visitwoliat/app/ui/components
+          mkdir -p app/src/main/java/com/visitwoliat/app/ui/screens
+          mkdir -p app/src/main/java/com/visitwoliat/app/ui/theme
+
+          cat << 'EOF' > settings.gradle.kts
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = "VisitWoliat"
+          include(":app")
+          EOF
+
+          cat << 'EOF' > build.gradle.kts
+          plugins {
+              id("com.android.application") version "8.2.2" apply false
+              id("org.jetbrains.kotlin.android") version "1.9.22" apply false
+          }
+          EOF
+
+          cat << 'EOF' > app/build.gradle.kts
+          plugins {
+              id("com.android.application")
+              id("org.jetbrains.kotlin.android")
+          }
+
+          android {
+              namespace = "com.visitwoliat.app"
+              compileSdk = 34
+
+              defaultConfig {
+                  applicationId = "com.visitwoliat.app"
+                  minSdk = 24
+                  targetSdk = 34
+                  versionCode = 1
+                  versionName = "1.0.0"
+              }
+
+              buildTypes {
+                  release {
+                      isMinifyEnabled = false
+                  }
+              }
+              compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = "17"
+              }
+              buildFeatures {
+                  compose = true
+              }
+              composeOptions {
+                  kotlinCompilerExtensionVersion = "1.5.8"
+              }
+          }
+
+          dependencies {
+              implementation("androidx.core:core-ktx:1.12.0")
+              implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+              implementation("androidx.activity:activity-compose:1.8.2")
+
+              val composeBom = platform("androidx.compose:compose-bom:2024.02.01")
+              implementation(composeBom)
+              implementation("androidx.compose.ui:ui")
+              implementation("androidx.compose.ui:ui-graphics")
+              implementation("androidx.compose.material3:material3")
+              implementation("androidx.compose.material:material-icons-extended")
+              implementation("androidx.navigation:navigation-compose:2.7.7")
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/res/values/strings.xml
+          <resources>
+              <string name="app_name">Visit Woliat</string>
+          </resources>
+          EOF
+
+          cat << 'EOF' > app/src/main/res/values/themes.xml
+          <resources>
+              <style name="Theme.VisitWoliat" parent="android:Theme.Material.Light.NoActionBar" />
+          </resources>
+          EOF
+
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <application
+                  android:allowBackup="true"
+                  android:icon="@android:drawable/sym_def_app_icon"
+                  android:label="@string/app_name"
+                  android:supportsRtl="true"
+                  android:theme="@style/Theme.VisitWoliat">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:theme="@style/Theme.VisitWoliat">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/theme/Color.kt
+          package com.visitwoliat.app.ui.theme
+          import androidx.compose.ui.graphics.Color
+
+          val ForestGreenPrimary = Color(0xFF0F382A)
+          val ForestGreenLight = Color(0xFF1D5A45)
+          val ForestGreenDark = Color(0xFF082219)
+          val WarmGold = Color(0xFFD4AF37)
+          val WarmGoldLight = Color(0xFFE5C768)
+          val WarmGoldDark = Color(0xFFA5801C)
+          val IvoryBackground = Color(0xFFFAF8F2)
+          val IvorySurface = Color(0xFFFFFFFF)
+          val IvorySurfaceVariant = Color(0xFFF3EFE6)
+          val CharcoalText = Color(0xFF1C1E1B)
+          val CharcoalMuted = Color(0xFF555B53)
+          val BorderSubtle = Color(0xFFE2DED5)
+          val DocumentedBadgeBg = Color(0xFFE8F5E9)
+          val DocumentedBadgeText = Color(0xFF1B5E20)
+          val OralTraditionBadgeBg = Color(0xFFFFF8E1)
+          val OralTraditionBadgeText = Color(0xFFB78103)
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/theme/Type.kt
+          package com.visitwoliat.app.ui.theme
+          import androidx.compose.material3.Typography
+          import androidx.compose.ui.text.TextStyle
+          import androidx.compose.ui.text.font.FontFamily
+          import androidx.compose.ui.text.font.FontWeight
+          import androidx.compose.ui.unit.sp
+
+          val Typography = Typography(
+              headlineLarge = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold, fontSize = 26.sp),
+              headlineMedium = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold, fontSize = 20.sp),
+              titleLarge = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp),
+              titleMedium = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+              bodyLarge = TextStyle(fontWeight = FontWeight.Normal, fontSize = 14.sp),
+              bodyMedium = TextStyle(fontWeight = FontWeight.Normal, fontSize = 13.sp),
+              labelSmall = TextStyle(fontWeight = FontWeight.Medium, fontSize = 11.sp)
+          )
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/theme/Theme.kt
+          package com.visitwoliat.app.ui.theme
+          import androidx.compose.material3.MaterialTheme
+          import androidx.compose.material3.lightColorScheme
+          import androidx.compose.runtime.Composable
+
+          private val LightColorScheme = lightColorScheme(
+              primary = ForestGreenPrimary,
+              onPrimary = IvoryBackground,
+              secondary = WarmGold,
+              background = IvoryBackground,
+              onBackground = CharcoalText,
+              surface = IvorySurface,
+              onSurface = CharcoalText
+          )
+
+          @Composable
+          fun VisitWoliatTheme(content: @Composable () -> Unit) {
+              MaterialTheme(colorScheme = LightColorScheme, typography = Typography, content = content)
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/data/Models.kt
+          package com.visitwoliat.app.data
+
+          enum class EvidenceType { DOCUMENTED_FACT, ORAL_TRADITION }
+          enum class DestinationCategory { ALL, MOUNTAINS, WATERFALLS, HISTORICAL_LANDMARKS, CULTURAL_SITES }
+
+          data class HistoricalFigure(
+              val id: String,
+              val name: String,
+              val roleTitle: String,
+              val reignOrPeriod: String,
+              val dynasty: String,
+              val description: String,
+              val militaryLegacy: String,
+              val evidenceType: EvidenceType,
+              val citations: List<String>
+          )
+
+          data class TimelineEvent(
+              val yearApprox: String,
+              val title: String,
+              val summary: String,
+              val evidenceType: EvidenceType,
+              val sourceRef: String
+          )
+
+          data class Destination(
+              val id: String,
+              val name: String,
+              val category: DestinationCategory,
+              val location: String,
+              val elevationOrSpecs: String,
+              val description: String,
+              val visitorTips: String,
+              val bestTimeToVisit: String
+          )
+
+          data class CulturalItem(
+              val title: String,
+              val nativeTerm: String,
+              val category: String,
+              val overview: String,
+              val significance: String
+          )
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/data/VisitWoliatRepository.kt
+          package com.visitwoliat.app.data
+
+          object VisitWoliatRepository {
+              val historicalFigures = listOf(
+                  HistoricalFigure(
+                      id = "tona_gaga",
+                      name = "Kawo Tona Gaga",
+                      roleTitle = "Last King (Kawo) of Wolaita",
+                      reignOrPeriod = "c. 1890 – 1894 CE",
+                      dynasty = "Tigre-Malla Dynasty",
+                      description = "Kawo Tona was the final sovereign monarch of the independent Kingdom of Wolaita. Renowned as a tactical commander, he fortified the kingdom with deep trenches ('kella') and defensive ramparts across Mount Damota.",
+                      militaryLegacy = "Led resilient defensive campaigns during the late 19th-century regional conflicts until the fierce 1894 engagement. He remains an emblem of sovereignty and civic valor.",
+                      evidenceType = EvidenceType.DOCUMENTED_FACT,
+                      citations = listOf("Bahru Zewde, 'A History of Modern Ethiopia'", "Heritage Survey Archives")
+                  ),
+                  HistoricalFigure(
+                      id = "motolomi",
+                      name = "Kawo Motolomi Sato",
+                      roleTitle = "Foundational Monarch of Medieval Wolaita/Damot",
+                      reignOrPeriod = "c. 13th Century (Traditional / Hagiographical)",
+                      dynasty = "Wolaita Malla Dynasty",
+                      description = "Celebrated ruler associated in oral tradition and religious chronicles with vast sovereign influence across southwestern and central highlands before royal transitions.",
+                      militaryLegacy = "Famed in oral lore for cavalry movements and regional border defenses prior to 16th-century realignments.",
+                      evidenceType = EvidenceType.ORAL_TRADITION,
+                      citations = listOf("Hagiography of Tekle Haymanot (Gedle)", "Wolaita Oral King Lists (Recorded 1974-1998)")
+                  )
+              )
+
+              val timeline = listOf(
+                  TimelineEvent(
+                      yearApprox = "c. 1250 – 1300",
+                      title = "Establishment of the Wolaita Malla Period",
+                      summary = "Early statehood formation centered along fertile river valleys and mountain fortresses.",
+                      evidenceType = EvidenceType.ORAL_TRADITION,
+                      sourceRef = "Regional elders' genealogy and oral King Lists"
+                  ),
+                  TimelineEvent(
+                      yearApprox = "1894",
+                      title = "The Battle of Wolaita",
+                      summary = "Sovereign resistance led by Kawo Tona against imperial incorporation, concluding months of protracted defense.",
+                      evidenceType = EvidenceType.DOCUMENTED_FACT,
+                      sourceRef = "Imperial records & French traveler accounts (Vanderheym, 1896)"
+                  ),
+                  TimelineEvent(
+                      yearApprox = "2025",
+                      title = "UNESCO Inscription of Gifaataa",
+                      summary = "Gifaataa, the ancient Wolaita New Year and reconciliation festival, inscribed on the UNESCO Representative List of Intangible Cultural Heritage.",
+                      evidenceType = EvidenceType.DOCUMENTED_FACT,
+                      sourceRef = "UNESCO Intangible Cultural Heritage Convention (20.COM)"
+                  )
+              )
+
+              val destinations = listOf(
+                  Destination(
+                      id = "damota",
+                      name = "Mount Damota",
+                      category = DestinationCategory.MOUNTAINS,
+                      location = "North of Wolaita Sodo (~12 km)",
+                      elevationOrSpecs = "Peak: 2,908 m altitude",
+                      description = "The spiritual and geographical heart of Wolaita. An extinct volcanic massif offering 360-degree panoramic vistas of the Great Rift Valley and Lake Abaya.",
+                      visitorTips = "Bring trekking poles and windbreakers. Sunrise hikes offer clear visibility before midday mountain mists roll in.",
+                      bestTimeToVisit = "October to February (dry, sunny season)"
+                  ),
+                  Destination(
+                      id = "ajora_falls",
+                      name = "Ajora Twin Waterfalls",
+                      category = DestinationCategory.WATERFALLS,
+                      location = "Boloso Bombe District (~45 km from Sodo)",
+                      elevationOrSpecs = "Cascades drop ~210 m into forested gorge",
+                      description = "Magnificent twin waterfalls (Awa and Alae) plunging side by side into a deep canyon surrounded by endemic flora and wild fauna.",
+                      visitorTips = "Hire a local eco-guide at Bombe town. Paths can become slippery; sturdy trail shoes are required.",
+                      bestTimeToVisit = "September to December (high flow with clear footpaths)"
+                  ),
+                  Destination(
+                      id = "mochena_borago",
+                      name = "Mochena Borago Rockshelter",
+                      category = DestinationCategory.HISTORICAL_LANDMARKS,
+                      location = "Flank of Mount Damota",
+                      elevationOrSpecs = "Archaeological site: ~2,200 m altitude",
+                      description = "A renowned archaeological rock shelter yielding Stone Age obsidian tools and evidence of human fire use spanning over 50,000 years.",
+                      visitorTips = "Coordinate with Wolaita Zone Tourism & Culture Bureau.",
+                      bestTimeToVisit = "Year-round; avoid heavy rainfalls"
+                  )
+              )
+
+              val culturalHeritage = listOf(
+                  CulturalItem(
+                      title = "Gifaataa New Year Festival",
+                      nativeTerm = "ጊፋታ (Gifaataa)",
+                      category = "Festivals & Rites",
+                      overview = "The seasonal turning point marking the end of the rainy season and dawn of harvest. Rooted in community reconciliation, where past grudges are formally resolved before the New Year begins.",
+                      significance = "Inscribed by UNESCO in 2025 as a masterpiece of Intangible Cultural Heritage of Humanity."
+                  ),
+                  CulturalItem(
+                      title = "Dunguza Traditional Woven Textile",
+                      nativeTerm = "ዱንጉዛ (Dunguza)",
+                      category = "Attire & Craftsmanship",
+                      overview = "Masterfully hand-woven heavy cotton textile featuring iconic black, red, and golden-yellow geometric patterns. Worn proudly during ceremonies and civic gatherings.",
+                      significance = "Symbol of Wolaita national identity and artistic heritage."
+                  )
+              )
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/localization/AppLanguage.kt
+          package com.visitwoliat.app.localization
+          import androidx.compose.runtime.getValue
+          import androidx.compose.runtime.mutableStateOf
+          import androidx.compose.runtime.setValue
+
+          enum class AppLanguage(val code: String, val displayName: String, val nativeName: String) {
+              ENGLISH("en", "English", "English"),
+              AMHARIC("am", "Amharic", "አማርኛ"),
+              WOLAITIGNA("wal", "Wolaitigna", "Wolayttattuwa")
+          }
+
+          object TranslationStrings {
+              private val translations = mapOf(
+                  AppLanguage.ENGLISH to mapOf(
+                      "app_title" to "VISIT WOLIAT",
+                      "slogan" to "Discover the History. Explore the Land.",
+                      "sub_slogan" to "Southern Ethiopia's Sovereign Cradle of Heritage and Scenic Wonder",
+                      "explore_destinations" to "Explore Destinations",
+                      "discover_history" to "Discover History",
+                      "featured_destinations" to "Featured Destinations",
+                      "featured_culture" to "Cultural Treasures",
+                      "documented_fact" to "Documented Fact",
+                      "oral_tradition" to "Oral Tradition",
+                      "search_placeholder" to "Search landmarks, mountains...",
+                      "history_title" to "Kingdom & Heritage",
+                      "explore_title" to "Destinations",
+                      "culture_title" to "Living Traditions",
+                      "languages_title" to "Choose Language",
+                      "about_title" to "About Project",
+                      "no_results" to "No records matching your search."
+                  ),
+                  AppLanguage.AMHARIC to mapOf(
+                      "app_title" to "ወላይታን ይጎብኙ",
+                      "slogan" to "ታሪኩን ይወቁ። ምድሪቱን ይጎብኙ።",
+                      "sub_slogan" to "የደቡብ ኢትዮጵያ ታላቅ ታሪካዊ ቅርስ እና የተፈጥሮ ውበት መፍለቂያ",
+                      "explore_destinations" to "መዳረሻዎችን ይጎብኙ",
+                      "discover_history" to "ታሪኩን ይመርምሩ",
+                      "featured_destinations" to "ተመራጭ የቱሪዝም ስፍራዎች",
+                      "featured_culture" to "የባህል ቅርሶች",
+                      "documented_fact" to "በሰነድ የተረጋገጠ",
+                      "oral_tradition" to "የአፍ ታሪክ / ትውፊት",
+                      "search_placeholder" to "ቦታዎችን፣ ቅርሶችን ፈልግ...",
+                      "history_title" to "የወላይታ መንግሥት ታሪክ",
+                      "explore_title" to "የጉብኝት መዳረሻዎች",
+                      "culture_title" to "ህያው ባህል እና ቋንቋ",
+                      "languages_title" to "ቋንቋ ይምረጡ",
+                      "about_title" to "ስለ ፕሮጀክቱ",
+                      "no_results" to "የተፈለገው መረጃ አልተገኘም።"
+                  ),
+                  AppLanguage.WOLAITIGNA to mapOf(
+                      "app_title" to "WOLAYTA YAA BE’ITE",
+                      "slogan" to "Tarikiyan Era! Sa'aa Yuuyi Be'ite!",
+                      "sub_slogan" to "Tohssa biitta kawotethaa tarikenne medhettaa lo'otethaa erite",
+                      "explore_destinations" to "Sohootu Yuuyite",
+                      "discover_history" to "Tariikiyaa Erite",
+                      "featured_destinations" to "Dootettiya Sohotu",
+                      "featured_culture" to "Woganne Naqaashaa",
+                      "documented_fact" to "Xaafeettidi Geeshshettiis",
+                      "oral_tradition" to "Doonan Yiya Hayttaa",
+                      "search_placeholder" to "Sohota, Kawota koyite...",
+                      "history_title" to "Kawotethaa Tariikiyaa",
+                      "explore_title" to "Be'iyo Sohota",
+                      "culture_title" to "Nu Wogaanne Doonaa",
+                      "languages_title" to "Doonata Doorite",
+                      "about_title" to "Oosuwaa Gishshata",
+                      "no_results" to "Aybba koshshakka beettibeenna."
+                  )
+              )
+
+              fun get(key: String, lang: AppLanguage): String {
+                  return translations[lang]?.get(key) ?: translations[AppLanguage.ENGLISH]?.get(key) ?: key
+              }
+          }
+
+          object LanguageState {
+              var currentLanguage by mutableStateOf(AppLanguage.ENGLISH)
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/components/CommonComponents.kt
+          package com.visitwoliat.app.ui.components
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.border
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.material3.MaterialTheme
+          import androidx.compose.material3.Text
+          import androidx.compose.runtime.Composable
+          import androidx.compose.ui.Modifier
+          import androidx.compose.ui.draw.clip
+          import androidx.compose.ui.text.font.FontWeight
+          import androidx.compose.ui.unit.dp
+          import com.visitwoliat.app.data.EvidenceType
+          import com.visitwoliat.app.localization.LanguageState
+          import com.visitwoliat.app.localization.TranslationStrings
+          import com.visitwoliat.app.ui.theme.*
+
+          @Composable
+          fun EvidenceBadge(evidenceType: EvidenceType, modifier: Modifier = Modifier) {
+              val lang = LanguageState.currentLanguage
+              val isDocumented = evidenceType == EvidenceType.DOCUMENTED_FACT
+              val bg = if (isDocumented) DocumentedBadgeBg else OralTraditionBadgeBg
+              val fg = if (isDocumented) DocumentedBadgeText else OralTraditionBadgeText
+              val label = if (isDocumented) TranslationStrings.get("documented_fact", lang) else TranslationStrings.get("oral_tradition", lang)
+
+              Box(
+                  modifier = modifier
+                      .clip(RoundedCornerShape(8.dp))
+                      .background(bg)
+                      .border(0.5.dp, fg.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                      .padding(horizontal = 8.dp, vertical = 3.dp)
+              ) {
+                  Text(text = label, color = fg, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold)
+              }
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/screens/HomeScreen.kt
+          package com.visitwoliat.app.ui.screens
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.clickable
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.LazyRow
+          import androidx.compose.foundation.lazy.items
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.material.icons.Icons
+          import androidx.compose.material.icons.filled.Explore
+          import androidx.compose.material.icons.filled.HistoryEdu
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.Composable
+          import androidx.compose.ui.Alignment
+          import androidx.compose.ui.Modifier
+          import androidx.compose.ui.draw.clip
+          import androidx.compose.ui.text.font.FontWeight
+          import androidx.compose.ui.unit.dp
+          import androidx.compose.ui.unit.sp
+          import com.visitwoliat.app.data.VisitWoliatRepository
+          import com.visitwoliat.app.localization.LanguageState
+          import com.visitwoliat.app.localization.TranslationStrings
+          import com.visitwoliat.app.ui.theme.*
+
+          @Composable
+          fun HomeScreen(onNavigateToExplore: () -> Unit, onNavigateToHistory: () -> Unit) {
+              val lang = LanguageState.currentLanguage
+
+              LazyColumn(
+                  modifier = Modifier.fillMaxSize().background(IvoryBackground),
+                  contentPadding = PaddingValues(bottom = 96.dp)
+              ) {
+                  item {
+                      Box(
+                          modifier = Modifier.fillMaxWidth().background(ForestGreenDark).padding(horizontal = 20.dp, vertical = 26.dp)
+                      ) {
+                          Column {
+                              Text(text = TranslationStrings.get("app_title", lang), style = MaterialTheme.typography.headlineLarge, color = WarmGold)
+                              Spacer(modifier = Modifier.height(6.dp))
+                              Text(text = TranslationStrings.get("slogan", lang), style = MaterialTheme.typography.titleMedium, color = IvoryBackground)
+                              Text(text = TranslationStrings.get("sub_slogan", lang), style = MaterialTheme.typography.bodyMedium, color = IvoryBackground.copy(alpha = 0.8f))
+                              Spacer(modifier = Modifier.height(18.dp))
+                              Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                  Button(
+                                      onClick = onNavigateToExplore,
+                                      colors = ButtonDefaults.buttonColors(containerColor = WarmGold),
+                                      shape = RoundedCornerShape(10.dp)
+                                  ) {
+                                      Icon(Icons.Default.Explore, contentDescription = null, tint = CharcoalText)
+                                      Spacer(modifier = Modifier.width(6.dp))
+                                      Text(TranslationStrings.get("explore_destinations", lang), color = CharcoalText, fontWeight = FontWeight.Bold)
+                                  }
+                                  OutlinedButton(
+                                      onClick = onNavigateToHistory,
+                                      shape = RoundedCornerShape(10.dp),
+                                      colors = ButtonDefaults.outlinedButtonColors(contentColor = IvoryBackground)
+                                  ) {
+                                      Icon(Icons.Default.HistoryEdu, contentDescription = null, tint = IvoryBackground)
+                                      Spacer(modifier = Modifier.width(6.dp))
+                                      Text(TranslationStrings.get("discover_history", lang), color = IvoryBackground, fontWeight = FontWeight.Bold)
+                                  }
+                              }
+                          }
+                      }
+                  }
+
+                  item {
+                      Spacer(modifier = Modifier.height(20.dp))
+                      Text(
+                          text = TranslationStrings.get("featured_destinations", lang),
+                          style = MaterialTheme.typography.titleLarge,
+                          color = ForestGreenPrimary,
+                          modifier = Modifier.padding(horizontal = 20.dp)
+                      )
+                      Spacer(modifier = Modifier.height(12.dp))
+                      LazyRow(
+                          contentPadding = PaddingValues(horizontal = 20.dp),
+                          horizontalArrangement = Arrangement.spacedBy(14.dp)
+                      ) {
+                          items(VisitWoliatRepository.destinations) { destination ->
+                              Card(
+                                  modifier = Modifier.width(260.dp).clickable { onNavigateToExplore() },
+                                  shape = RoundedCornerShape(14.dp),
+                                  colors = CardDefaults.cardColors(containerColor = IvorySurface),
+                                  elevation = CardDefaults.cardElevation(2.dp)
+                              ) {
+                                  Column(modifier = Modifier.padding(14.dp)) {
+                                      Box(
+                                          modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(10.dp)).background(ForestGreenLight.copy(alpha = 0.25f)),
+                                          contentAlignment = Alignment.Center
+                                      ) {
+                                          Text(destination.name.take(2).uppercase(), style = MaterialTheme.typography.headlineLarge, color = ForestGreenPrimary)
+                                      }
+                                      Spacer(modifier = Modifier.height(10.dp))
+                                      Text(destination.name, style = MaterialTheme.typography.titleMedium, color = CharcoalText)
+                                      Text(destination.location, style = MaterialTheme.typography.bodyMedium, color = CharcoalMuted)
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/screens/HistoryScreen.kt
+          package com.visitwoliat.app.ui.screens
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.items
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.Composable
+          import androidx.compose.ui.Alignment
+          import androidx.compose.ui.Modifier
+          import androidx.compose.ui.unit.dp
+          import androidx.compose.ui.unit.sp
+          import com.visitwoliat.app.data.VisitWoliatRepository
+          import com.visitwoliat.app.localization.LanguageState
+          import com.visitwoliat.app.localization.TranslationStrings
+          import com.visitwoliat.app.ui.components.EvidenceBadge
+          import com.visitwoliat.app.ui.theme.*
+
+          @Composable
+          fun HistoryScreen() {
+              val lang = LanguageState.currentLanguage
+
+              LazyColumn(
+                  modifier = Modifier.fillMaxSize().background(IvoryBackground),
+                  contentPadding = PaddingValues(16.dp),
+                  verticalArrangement = Arrangement.spacedBy(14.dp)
+              ) {
+                  item {
+                      Text(text = TranslationStrings.get("history_title", lang), style = MaterialTheme.typography.headlineLarge, color = ForestGreenPrimary)
+                      Spacer(modifier = Modifier.height(4.dp))
+                      Text(text = "Documented reigns and oral histories.", style = MaterialTheme.typography.bodyMedium, color = CharcoalMuted)
+                  }
+
+                  items(VisitWoliatRepository.historicalFigures) { figure ->
+                      Card(
+                          modifier = Modifier.fillMaxWidth(),
+                          shape = RoundedCornerShape(14.dp),
+                          colors = CardDefaults.cardColors(containerColor = IvorySurface),
+                          elevation = CardDefaults.cardElevation(2.dp)
+                      ) {
+                          Column(modifier = Modifier.padding(16.dp)) {
+                              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                  Column(modifier = Modifier.weight(1f)) {
+                                      Text(text = figure.name, style = MaterialTheme.typography.titleLarge, color = ForestGreenPrimary)
+                                      Text(text = "${figure.roleTitle} • ${figure.reignOrPeriod}", style = MaterialTheme.typography.bodyMedium, color = WarmGoldDark)
+                                  }
+                                  EvidenceBadge(figure.evidenceType)
+                              }
+                              Spacer(modifier = Modifier.height(8.dp))
+                              Text(text = figure.description, style = MaterialTheme.typography.bodyLarge, color = CharcoalText)
+                              Spacer(modifier = Modifier.height(8.dp))
+                              Text(text = "Sources: ${figure.citations.joinToString("; ")}", style = MaterialTheme.typography.labelSmall, color = CharcoalMuted)
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/screens/ExploreScreen.kt
+          package com.visitwoliat.app.ui.screens
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.items
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.material.icons.Icons
+          import androidx.compose.material.icons.filled.LocationOn
+          import androidx.compose.material.icons.filled.Search
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.*
+          import androidx.compose.ui.Alignment
+          import androidx.compose.ui.Modifier
+          import androidx.compose.ui.unit.dp
+          import com.visitwoliat.app.data.VisitWoliatRepository
+          import com.visitwoliat.app.localization.LanguageState
+          import com.visitwoliat.app.localization.TranslationStrings
+          import com.visitwoliat.app.ui.theme.*
+
+          @Composable
+          fun ExploreScreen() {
+              val lang = LanguageState.currentLanguage
+              var searchQuery by remember { mutableStateOf("") }
+
+              val filteredDestinations = remember(searchQuery) {
+                  VisitWoliatRepository.destinations.filter {
+                      it.name.contains(searchQuery, ignoreCase = true) || it.location.contains(searchQuery, ignoreCase = true)
+                  }
+              }
+
+              Column(modifier = Modifier.fillMaxSize().background(IvoryBackground)) {
+                  Column(modifier = Modifier.fillMaxWidth().background(ForestGreenDark).padding(16.dp)) {
+                      Text(text = TranslationStrings.get("explore_title", lang), style = MaterialTheme.typography.headlineLarge, color = WarmGold)
+                      Spacer(modifier = Modifier.height(10.dp))
+                      OutlinedTextField(
+                          value = searchQuery,
+                          onValueChange = { searchQuery = it },
+                          modifier = Modifier.fillMaxWidth(),
+                          placeholder = { Text(TranslationStrings.get("search_placeholder", lang), color = IvoryBackground.copy(alpha = 0.6f)) },
+                          leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = WarmGold) },
+                          singleLine = true,
+                          shape = RoundedCornerShape(10.dp),
+                          colors = OutlinedTextFieldDefaults.colors(
+                              focusedBorderColor = WarmGold,
+                              unfocusedBorderColor = IvoryBackground.copy(alpha = 0.4f),
+                              focusedTextColor = IvoryBackground,
+                              unfocusedTextColor = IvoryBackground
+                          )
+                      )
+                  }
+
+                  LazyColumn(
+                      modifier = Modifier.fillMaxSize(),
+                      contentPadding = PaddingValues(16.dp),
+                      verticalArrangement = Arrangement.spacedBy(14.dp)
+                  ) {
+                      items(filteredDestinations) { dest ->
+                          Card(
+                              modifier = Modifier.fillMaxWidth(),
+                              shape = RoundedCornerShape(14.dp),
+                              colors = CardDefaults.cardColors(containerColor = IvorySurface),
+                              elevation = CardDefaults.cardElevation(2.dp)
+                          ) {
+                              Column(modifier = Modifier.padding(16.dp)) {
+                                  Text(dest.name, style = MaterialTheme.typography.titleLarge, color = ForestGreenPrimary)
+                                  Row(verticalAlignment = Alignment.CenterVertically) {
+                                      Icon(Icons.Default.LocationOn, contentDescription = null, tint = WarmGoldDark, modifier = Modifier.size(16.dp))
+                                      Spacer(modifier = Modifier.width(4.dp))
+                                      Text("${dest.location} (${dest.elevationOrSpecs})", style = MaterialTheme.typography.bodyMedium, color = CharcoalMuted)
+                                  }
+                                  Spacer(modifier = Modifier.height(8.dp))
+                                  Text(dest.description, style = MaterialTheme.typography.bodyLarge, color = CharcoalText)
+                                  Spacer(modifier = Modifier.height(6.dp))
+                                  Text("Best Season: ${dest.bestTimeToVisit}", style = MaterialTheme.typography.labelSmall, color = WarmGoldDark)
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/screens/CultureScreen.kt
+          package com.visitwoliat.app.ui.screens
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.items
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.Composable
+          import androidx.compose.ui.Modifier
+          import androidx.compose.ui.unit.dp
+          import com.visitwoliat.app.data.VisitWoliatRepository
+          import com.visitwoliat.app.localization.LanguageState
+          import com.visitwoliat.app.localization.TranslationStrings
+          import com.visitwoliat.app.ui.theme.*
+
+          @Composable
+          fun CultureScreen() {
+              val lang = LanguageState.currentLanguage
+
+              LazyColumn(
+                  modifier = Modifier.fillMaxSize().background(IvoryBackground),
+                  contentPadding = PaddingValues(16.dp),
+                  verticalArrangement = Arrangement.spacedBy(14.dp)
+              ) {
+                  item {
+                      Text(text = TranslationStrings.get("culture_title", lang), style = MaterialTheme.typography.headlineLarge, color = ForestGreenPrimary)
+                      Spacer(modifier = Modifier.height(4.dp))
+                      Text(text = "Living traditions, language, and UNESCO heritage.", style = MaterialTheme.typography.bodyMedium, color = CharcoalMuted)
+                  }
+
+                  items(VisitWoliatRepository.culturalHeritage) { item ->
+                      Card(
+                          modifier = Modifier.fillMaxWidth(),
+                          shape = RoundedCornerShape(14.dp),
+                          colors = CardDefaults.cardColors(containerColor = IvorySurface),
+                          elevation = CardDefaults.cardElevation(2.dp)
+                      ) {
+                          Column(modifier = Modifier.padding(16.dp)) {
+                              Text(item.nativeTerm, color = WarmGoldDark, style = MaterialTheme.typography.labelSmall)
+                              Text(item.title, style = MaterialTheme.typography.titleLarge, color = CharcoalText)
+                              Spacer(modifier = Modifier.height(6.dp))
+                              Text(item.overview, style = MaterialTheme.typography.bodyLarge, color = CharcoalText)
+                              Spacer(modifier = Modifier.height(6.dp))
+                              Text("Significance: ${item.significance}", style = MaterialTheme.typography.bodyMedium, color = ForestGreenPrimary)
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/screens/LanguageScreen.kt
+          package com.visitwoliat.app.ui.screens
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.clickable
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.lazy.LazyColumn
+          import androidx.compose.foundation.lazy.items
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.material.icons.Icons
+          import androidx.compose.material.icons.filled.Check
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.Composable
+          import androidx.compose.ui.Alignment
+          import androidx.compose.ui.Modifier
+          import androidx.compose.ui.unit.dp
+          import androidx.compose.ui.unit.sp
+          import com.visitwoliat.app.localization.AppLanguage
+          import com.visitwoliat.app.localization.LanguageState
+          import com.visitwoliat.app.localization.TranslationStrings
+          import com.visitwoliat.app.ui.theme.*
+
+          @Composable
+          fun LanguageScreen() {
+              val currentLang = LanguageState.currentLanguage
+
+              Column(modifier = Modifier.fillMaxSize().background(IvoryBackground).padding(16.dp)) {
+                  Text(text = TranslationStrings.get("languages_title", currentLang), style = MaterialTheme.typography.headlineLarge, color = ForestGreenPrimary)
+                  Spacer(modifier = Modifier.height(16.dp))
+
+                  LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                      items(AppLanguage.values()) { langOption ->
+                          val isSelected = currentLang == langOption
+                          Card(
+                              modifier = Modifier.fillMaxWidth().clickable { LanguageState.currentLanguage = langOption },
+                              shape = RoundedCornerShape(12.dp),
+                              colors = CardDefaults.cardColors(containerColor = if (isSelected) ForestGreenPrimary else IvorySurface),
+                              elevation = CardDefaults.cardElevation(2.dp)
+                          ) {
+                              Row(
+                                  modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                  horizontalArrangement = Arrangement.SpaceBetween,
+                                  verticalAlignment = Alignment.CenterVertically
+                              ) {
+                                  Text(
+                                      text = "${langOption.nativeName} (${langOption.displayName})",
+                                      fontWeight = FontWeight.Bold,
+                                      color = if (isSelected) WarmGold else CharcoalText
+                                  )
+                                  if (isSelected) {
+                                      Icon(Icons.Default.Check, contentDescription = null, tint = WarmGold)
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/ui/screens/AboutScreen.kt
+          package com.visitwoliat.app.ui.screens
+          import androidx.compose.foundation.background
+          import androidx.compose.foundation.layout.*
+          import androidx.compose.foundation.shape.RoundedCornerShape
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.Composable
+          import androidx.compose.ui.Modifier
+          import androidx.compose.ui.unit.dp
+          import com.visitwoliat.app.localization.LanguageState
+          import com.visitwoliat.app.localization.TranslationStrings
+          import com.visitwoliat.app.ui.theme.*
+
+          @Composable
+          fun AboutScreen() {
+              val lang = LanguageState.currentLanguage
+
+              Column(modifier = Modifier.fillMaxSize().background(IvoryBackground).padding(16.dp)) {
+                  Text(text = TranslationStrings.get("about_title", lang), style = MaterialTheme.typography.headlineLarge, color = ForestGreenPrimary)
+                  Spacer(modifier = Modifier.height(12.dp))
+                  Card(
+                      modifier = Modifier.fillMaxWidth(),
+                      shape = RoundedCornerShape(14.dp),
+                      colors = CardDefaults.cardColors(containerColor = IvorySurface),
+                      elevation = CardDefaults.cardElevation(2.dp)
+                  ) {
+                      Column(modifier = Modifier.padding(16.dp)) {
+                          Text("Mission", style = MaterialTheme.typography.titleLarge, color = ForestGreenPrimary)
+                          Spacer(modifier = Modifier.height(6.dp))
+                          Text("Visit Woliat is a cultural and tourism guide dedicated to sharing Wolaita's history, landmarks, and traditions worldwide.", style = MaterialTheme.typography.bodyLarge, color = CharcoalText)
+                          Spacer(modifier = Modifier.height(12.dp))
+                          Text("Verification", style = MaterialTheme.typography.titleLarge, color = ForestGreenPrimary)
+                          Spacer(modifier = Modifier.height(6.dp))
+                          Text("Documented facts are backed by historical/archaeological research. Oral traditions are labeled clearly to preserve cultural authenticity.", style = MaterialTheme.typography.bodyLarge, color = CharcoalText)
+                      }
+                  }
+              }
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/navigation/Navigation.kt
+          package com.visitwoliat.app.navigation
+          import androidx.compose.material.icons.Icons
+          import androidx.compose.material.icons.filled.*
+          import androidx.compose.ui.graphics.vector.ImageVector
+
+          sealed class Screen(val route: String, val icon: ImageVector) {
+              object Home : Screen("home", Icons.Default.Home)
+              object History : Screen("history", Icons.Default.HistoryEdu)
+              object Explore : Screen("explore", Icons.Default.Explore)
+              object Culture : Screen("culture", Icons.Default.Festival)
+              object Languages : Screen("languages", Icons.Default.Translate)
+              object About : Screen("about", Icons.Default.Info)
+          }
+
+          val bottomNavItems = listOf(
+              Screen.Home,
+              Screen.History,
+              Screen.Explore,
+              Screen.Culture,
+              Screen.Languages,
+              Screen.About
+          )
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/visitwoliat/app/MainActivity.kt
+          package com.visitwoliat.app
+          import android.os.Bundle
+          import androidx.activity.ComponentActivity
+          import androidx.activity.compose.setContent
+          import androidx.compose.foundation.layout.fillMaxSize
+          import androidx.compose.foundation.layout.padding
+          import androidx.compose.material3.*
+          import androidx.compose.runtime.getValue
+          import androidx.compose.ui.Modifier
+          import androidx.navigation.NavGraph.Companion.findStartDestination
+          import androidx.navigation.compose.NavHost
+          import androidx.navigation.compose.composable
+          import androidx.navigation.compose.currentBackStackEntryAsState
+          import androidx.navigation.compose.rememberNavController
+          import com.visitwoliat.app.navigation.Screen
+          import com.visitwoliat.app.navigation.bottomNavItems
+          import com.visitwoliat.app.ui.screens.*
+          import com.visitwoliat.app.ui.theme.ForestGreenDark
+          import com.visitwoliat.app.ui.theme.IvoryBackground
+          import com.visitwoliat.app.ui.theme.VisitWoliatTheme
+          import com.visitwoliat.app.ui.theme.WarmGold
+
+          class MainActivity : ComponentActivity() {
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+                  setContent {
+                      VisitWoliatTheme {
+                          val navController = rememberNavController()
+                          val navBackStackEntry by navController.currentBackStackEntryAsState()
+                          val currentRoute = navBackStackEntry?.destination?.route
+
+                          Scaffold(
+                              modifier = Modifier.fillMaxSize(),
+                              bottomBar = {
+                                  NavigationBar(containerColor = ForestGreenDark, contentColor = IvoryBackground) {
+                                      bottomNavItems.forEach { screen ->
+                                          val selected = currentRoute == screen.route
+                                          NavigationBarItem(
+                                              selected = selected,
+                                              onClick = {
+                                                  navController.navigate(screen.route) {
+                                                      popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                                      launchSingleTop = true
+                                                      restoreState = true
+                                                  }
+                                              },
+                                              icon = { Icon(screen.icon, contentDescription = null, tint = if (selected) WarmGold else IvoryBackground.copy(alpha = 0.5f)) },
+                                              label = { Text(screen.route.replaceFirstChar { it.uppercase() }, color = if (selected) WarmGold else IvoryBackground.copy(alpha = 0.5f)) }
+                                          )
+                                      }
+                                  }
+                              }
+                          ) { innerPadding ->
+                              NavHost(navController = navController, startDestination = Screen.Home.route, modifier = Modifier.padding(innerPadding)) {
+                                  composable(Screen.Home.route) { HomeScreen({ navController.navigate(Screen.Explore.route) }, { navController.navigate(Screen.History.route) }) }
+                                  composable(Screen.History.route) { HistoryScreen() }
+                                  composable(Screen.Explore.route) { ExploreScreen() }
+                                  composable(Screen.Culture.route) { CultureScreen() }
+                                  composable(Screen.Languages.route) { LanguageScreen() }
+                                  composable(Screen.About.route) { AboutScreen() }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
+      - name: Setup Gradle Wrapper
+        run: gradle wrapper --gradle-version 8.5
+
+      - name: Build Android APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK to Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: VisitWoliat-App
+          path: app/build/outputs/apk/debug/*.apk
