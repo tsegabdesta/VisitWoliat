@@ -96,13 +96,12 @@ jobs:
               implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
               implementation("androidx.activity:activity-compose:1.8.2")
 
-              val composeBom = platform("androidx.compose:compose-bom:2024.02.01")
-              implementation(composeBom)
+              implementation(platform("androidx.compose:compose-bom:2024.02.01"))
               implementation("androidx.compose.ui:ui")
               implementation("androidx.compose.ui:ui-graphics")
+              implementation("androidx.compose.ui:ui-tooling-preview")
               implementation("androidx.compose.material3:material3")
-              implementation("androidx.compose.material:material-icons-extended")
-              implementation("androidx.navigation:navigation-compose:2.7.7")
+              implementation("androidx.navigation:navigation-compose:2.7.6")
           }
           EOF
 
@@ -148,14 +147,11 @@ jobs:
           val ForestGreenLight = Color(0xFF1D5A45)
           val ForestGreenDark = Color(0xFF082219)
           val WarmGold = Color(0xFFD4AF37)
-          val WarmGoldLight = Color(0xFFE5C768)
           val WarmGoldDark = Color(0xFFA5801C)
           val IvoryBackground = Color(0xFFFAF8F2)
           val IvorySurface = Color(0xFFFFFFFF)
-          val IvorySurfaceVariant = Color(0xFFF3EFE6)
           val CharcoalText = Color(0xFF1C1E1B)
           val CharcoalMuted = Color(0xFF555B53)
-          val BorderSubtle = Color(0xFFE2DED5)
           val DocumentedBadgeBg = Color(0xFFE8F5E9)
           val DocumentedBadgeText = Color(0xFF1B5E20)
           val OralTraditionBadgeBg = Color(0xFFFFF8E1)
@@ -261,7 +257,7 @@ jobs:
                       reignOrPeriod = "c. 1890 – 1894 CE",
                       dynasty = "Tigre-Malla Dynasty",
                       description = "Kawo Tona was the final sovereign monarch of the independent Kingdom of Wolaita. Renowned as a tactical commander, he fortified the kingdom with deep trenches ('kella') and defensive ramparts across Mount Damota.",
-                      militaryLegacy = "Led resilient defensive campaigns during the late 19th-century regional conflicts until the fierce 1894 engagement. He remains an emblem of sovereignty and civic valor.",
+                      militaryLegacy = "Led resilient defensive campaigns during late 19th-century regional conflicts until the fierce 1894 engagement. He remains an emblem of sovereignty and civic valor.",
                       evidenceType = EvidenceType.DOCUMENTED_FACT,
                       citations = listOf("Bahru Zewde, 'A History of Modern Ethiopia'", "Heritage Survey Archives")
                   ),
@@ -275,30 +271,6 @@ jobs:
                       militaryLegacy = "Famed in oral lore for cavalry movements and regional border defenses prior to 16th-century realignments.",
                       evidenceType = EvidenceType.ORAL_TRADITION,
                       citations = listOf("Hagiography of Tekle Haymanot (Gedle)", "Wolaita Oral King Lists (Recorded 1974-1998)")
-                  )
-              )
-
-              val timeline = listOf(
-                  TimelineEvent(
-                      yearApprox = "c. 1250 – 1300",
-                      title = "Establishment of the Wolaita Malla Period",
-                      summary = "Early statehood formation centered along fertile river valleys and mountain fortresses.",
-                      evidenceType = EvidenceType.ORAL_TRADITION,
-                      sourceRef = "Regional elders' genealogy and oral King Lists"
-                  ),
-                  TimelineEvent(
-                      yearApprox = "1894",
-                      title = "The Battle of Wolaita",
-                      summary = "Sovereign resistance led by Kawo Tona against imperial incorporation, concluding months of protracted defense.",
-                      evidenceType = EvidenceType.DOCUMENTED_FACT,
-                      sourceRef = "Imperial records & French traveler accounts (Vanderheym, 1896)"
-                  ),
-                  TimelineEvent(
-                      yearApprox = "2025",
-                      title = "UNESCO Inscription of Gifaataa",
-                      summary = "Gifaataa, the ancient Wolaita New Year and reconciliation festival, inscribed on the UNESCO Representative List of Intangible Cultural Heritage.",
-                      evidenceType = EvidenceType.DOCUMENTED_FACT,
-                      sourceRef = "UNESCO Intangible Cultural Heritage Convention (20.COM)"
                   )
               )
 
@@ -341,7 +313,7 @@ jobs:
                       nativeTerm = "ጊፋታ (Gifaataa)",
                       category = "Festivals & Rites",
                       overview = "The seasonal turning point marking the end of the rainy season and dawn of harvest. Rooted in community reconciliation, where past grudges are formally resolved before the New Year begins.",
-                      significance = "Inscribed by UNESCO in 2025 as a masterpiece of Intangible Cultural Heritage of Humanity."
+                      significance = "Inscribed by UNESCO as a masterpiece of Intangible Cultural Heritage of Humanity."
                   ),
                   CulturalItem(
                       title = "Dunguza Traditional Woven Textile",
@@ -375,7 +347,6 @@ jobs:
                       "explore_destinations" to "Explore Destinations",
                       "discover_history" to "Discover History",
                       "featured_destinations" to "Featured Destinations",
-                      "featured_culture" to "Cultural Treasures",
                       "documented_fact" to "Documented Fact",
                       "oral_tradition" to "Oral Tradition",
                       "search_placeholder" to "Search landmarks, mountains...",
@@ -383,8 +354,7 @@ jobs:
                       "explore_title" to "Destinations",
                       "culture_title" to "Living Traditions",
                       "languages_title" to "Choose Language",
-                      "about_title" to "About Project",
-                      "no_results" to "No records matching your search."
+                      "about_title" to "About Project"
                   ),
                   AppLanguage.AMHARIC to mapOf(
                       "app_title" to "ወላይታን ይጎብኙ",
@@ -393,7 +363,6 @@ jobs:
                       "explore_destinations" to "መዳረሻዎችን ይጎብኙ",
                       "discover_history" to "ታሪኩን ይመርምሩ",
                       "featured_destinations" to "ተመራጭ የቱሪዝም ስፍራዎች",
-                      "featured_culture" to "የባህል ቅርሶች",
                       "documented_fact" to "በሰነድ የተረጋገጠ",
                       "oral_tradition" to "የአፍ ታሪክ / ትውፊት",
                       "search_placeholder" to "ቦታዎችን፣ ቅርሶችን ፈልግ...",
@@ -401,8 +370,7 @@ jobs:
                       "explore_title" to "የጉብኝት መዳረሻዎች",
                       "culture_title" to "ህያው ባህል እና ቋንቋ",
                       "languages_title" to "ቋንቋ ይምረጡ",
-                      "about_title" to "ስለ ፕሮጀክቱ",
-                      "no_results" to "የተፈለገው መረጃ አልተገኘም።"
+                      "about_title" to "ስለ ፕሮጀክቱ"
                   ),
                   AppLanguage.WOLAITIGNA to mapOf(
                       "app_title" to "WOLAYTA YAA BE’ITE",
@@ -411,16 +379,14 @@ jobs:
                       "explore_destinations" to "Sohootu Yuuyite",
                       "discover_history" to "Tariikiyaa Erite",
                       "featured_destinations" to "Dootettiya Sohotu",
-                      "featured_culture" to "Woganne Naqaashaa",
                       "documented_fact" to "Xaafeettidi Geeshshettiis",
                       "oral_tradition" to "Doonan Yiya Hayttaa",
-                      "search_placeholder" to "Sohota, Kawota koyite...",
+                      "search_placeholder" to "Sohota koyite...",
                       "history_title" to "Kawotethaa Tariikiyaa",
                       "explore_title" to "Be'iyo Sohota",
                       "culture_title" to "Nu Wogaanne Doonaa",
                       "languages_title" to "Doonata Doorite",
-                      "about_title" to "Oosuwaa Gishshata",
-                      "no_results" to "Aybba koshshakka beettibeenna."
+                      "about_title" to "Oosuwaa Gishshata"
                   )
               )
 
@@ -482,8 +448,8 @@ jobs:
           import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.shape.RoundedCornerShape
           import androidx.compose.material.icons.Icons
-          import androidx.compose.material.icons.filled.Explore
-          import androidx.compose.material.icons.filled.HistoryEdu
+          import androidx.compose.material.icons.filled.Place
+          import androidx.compose.material.icons.filled.Star
           import androidx.compose.material3.*
           import androidx.compose.runtime.Composable
           import androidx.compose.ui.Alignment
@@ -521,7 +487,7 @@ jobs:
                                       colors = ButtonDefaults.buttonColors(containerColor = WarmGold),
                                       shape = RoundedCornerShape(10.dp)
                                   ) {
-                                      Icon(Icons.Default.Explore, contentDescription = null, tint = CharcoalText)
+                                      Icon(Icons.Default.Place, contentDescription = null, tint = CharcoalText)
                                       Spacer(modifier = Modifier.width(6.dp))
                                       Text(TranslationStrings.get("explore_destinations", lang), color = CharcoalText, fontWeight = FontWeight.Bold)
                                   }
@@ -530,7 +496,7 @@ jobs:
                                       shape = RoundedCornerShape(10.dp),
                                       colors = ButtonDefaults.outlinedButtonColors(contentColor = IvoryBackground)
                                   ) {
-                                      Icon(Icons.Default.HistoryEdu, contentDescription = null, tint = IvoryBackground)
+                                      Icon(Icons.Default.Star, contentDescription = null, tint = IvoryBackground)
                                       Spacer(modifier = Modifier.width(6.dp))
                                       Text(TranslationStrings.get("discover_history", lang), color = IvoryBackground, fontWeight = FontWeight.Bold)
                                   }
@@ -590,7 +556,6 @@ jobs:
           import androidx.compose.ui.Alignment
           import androidx.compose.ui.Modifier
           import androidx.compose.ui.unit.dp
-          import androidx.compose.ui.unit.sp
           import com.visitwoliat.app.data.VisitWoliatRepository
           import com.visitwoliat.app.localization.LanguageState
           import com.visitwoliat.app.localization.TranslationStrings
@@ -646,7 +611,7 @@ jobs:
           import androidx.compose.foundation.lazy.items
           import androidx.compose.foundation.shape.RoundedCornerShape
           import androidx.compose.material.icons.Icons
-          import androidx.compose.material.icons.filled.LocationOn
+          import androidx.compose.material.icons.filled.Place
           import androidx.compose.material.icons.filled.Search
           import androidx.compose.material3.*
           import androidx.compose.runtime.*
@@ -705,7 +670,7 @@ jobs:
                               Column(modifier = Modifier.padding(16.dp)) {
                                   Text(dest.name, style = MaterialTheme.typography.titleLarge, color = ForestGreenPrimary)
                                   Row(verticalAlignment = Alignment.CenterVertically) {
-                                      Icon(Icons.Default.LocationOn, contentDescription = null, tint = WarmGoldDark, modifier = Modifier.size(16.dp))
+                                      Icon(Icons.Default.Place, contentDescription = null, tint = WarmGoldDark, modifier = Modifier.size(16.dp))
                                       Spacer(modifier = Modifier.width(4.dp))
                                       Text("${dest.location} (${dest.elevationOrSpecs})", style = MaterialTheme.typography.bodyMedium, color = CharcoalMuted)
                                   }
@@ -788,7 +753,6 @@ jobs:
           import androidx.compose.ui.Alignment
           import androidx.compose.ui.Modifier
           import androidx.compose.ui.unit.dp
-          import androidx.compose.ui.unit.sp
           import com.visitwoliat.app.localization.AppLanguage
           import com.visitwoliat.app.localization.LanguageState
           import com.visitwoliat.app.localization.TranslationStrings
@@ -818,7 +782,7 @@ jobs:
                               ) {
                                   Text(
                                       text = "${langOption.nativeName} (${langOption.displayName})",
-                                      fontWeight = FontWeight.Bold,
+                                      fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                                       color = if (isSelected) WarmGold else CharcoalText
                                   )
                                   if (isSelected) {
@@ -880,10 +844,10 @@ jobs:
 
           sealed class Screen(val route: String, val icon: ImageVector) {
               object Home : Screen("home", Icons.Default.Home)
-              object History : Screen("history", Icons.Default.HistoryEdu)
-              object Explore : Screen("explore", Icons.Default.Explore)
-              object Culture : Screen("culture", Icons.Default.Festival)
-              object Languages : Screen("languages", Icons.Default.Translate)
+              object History : Screen("history", Icons.Default.Star)
+              object Explore : Screen("explore", Icons.Default.Place)
+              object Culture : Screen("culture", Icons.Default.Face)
+              object Languages : Screen("languages", Icons.Default.Settings)
               object About : Screen("about", Icons.Default.Info)
           }
 
@@ -970,7 +934,7 @@ jobs:
         run: gradle wrapper --gradle-version 8.5
 
       - name: Build Android APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK to Download
         uses: actions/upload-artifact@v4
