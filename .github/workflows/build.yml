@@ -27,6 +27,12 @@ jobs:
           mkdir -p app/src/main/java/com/visitwoliat/app/ui/screens
           mkdir -p app/src/main/java/com/visitwoliat/app/ui/theme
 
+          cat << 'EOF' > gradle.properties
+          android.useAndroidX=true
+          android.nonTransitiveRClass=true
+          org.gradle.jvmargs=-Xmx2048m
+          EOF
+
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
@@ -556,6 +562,7 @@ jobs:
           import androidx.compose.ui.Alignment
           import androidx.compose.ui.Modifier
           import androidx.compose.ui.unit.dp
+          import androidx.compose.ui.unit.sp
           import com.visitwoliat.app.data.VisitWoliatRepository
           import com.visitwoliat.app.localization.LanguageState
           import com.visitwoliat.app.localization.TranslationStrings
@@ -753,6 +760,7 @@ jobs:
           import androidx.compose.ui.Alignment
           import androidx.compose.ui.Modifier
           import androidx.compose.ui.unit.dp
+          import androidx.compose.ui.unit.sp
           import com.visitwoliat.app.localization.AppLanguage
           import com.visitwoliat.app.localization.LanguageState
           import com.visitwoliat.app.localization.TranslationStrings
@@ -934,7 +942,7 @@ jobs:
         run: gradle wrapper --gradle-version 8.5
 
       - name: Build Android APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug
 
       - name: Upload APK to Download
         uses: actions/upload-artifact@v4
